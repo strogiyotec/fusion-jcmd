@@ -36,7 +36,7 @@ jstack is available as a part of the Oracle's JDK since JDK 6. However, we have 
 >The release of JDK 8 introduced Java Mission Control, Java Flight Recorder, and jcmd utility for diagnosing problems with JVM and Java applications. It is suggested to use the latest utility, jcmd instead
 Which means that for java versions starting from 8 and higher the `jcmd should be used`
 ### jcmd
-Now let's cover jcmd.
+Now let's briefly cover jcmd.
 According to [official documentation](https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/tooldescr006.html)
 > The jcmd utility is used to send diagnostic command requests to the JVM, where these requests are useful for controlling Java Flight Recordings, troubleshoot, and diagnose JVM and Java Applications.
 `jcmd` is available as part of the JDK starting from version 8. It can do a lot more than `jstack` and is used as a general console based performance tracker tool for JVM. It is used in conjuction with events you are interested in. For example , in order to see the same stacktraces as we got with `jstack` above , the following command must be used `jcmd fusion-reactor.jar Thread.print`. 
@@ -46,17 +46,21 @@ From now on , we will compare `jcmd` with FusionReactor because all `jstack` fea
 ## Comparison
 
 ### Side note
-Before comparing both tools, we want to emhpasize that `jcmd` can only take statistics snapshots of the running JVM process which were available on the time of execution. On the other hand FusionReactor is a complete monitoring tool that supports a huge range of monitoring opions including Garbage collector , Heap allocations, JDBC , Web performance, Live debugging and a lot more. To be fair, we will only compare features that are available in both tools.
+Before comparing both tools, we want to emhpasize that `jcmd` can only take statistics snapshots of the running JVM process which was available on the time of execution. On the other hand FusionReactor is a complete monitoring tool that supports a huge range of monitoring options including Garbage collector , Heap allocations, JDBC , Web performance, Live debugging and a lot more. To be fair, we will only compare features that are available in both tools.
 
 ### Console vs Web
-The first big difference comes with the way both tools are launched. FusionReactor offers a web interface to monitor your JVM processes. The interface can be launched locally or through the Cloud in order to monitor remote processes in production environment. On the other hand `jcmd` can only be used within a terminal. Most people who get used to a great user experience offered by web or desktop apps won't feel comfortable opening the terminal to monitor the performance of the underlying application. Moreover, `jcmd` can only get snapshots of the JVM processes that runs on the same host which means that `jcmd` does not support remote processes. In order to use `jcmd` in production the developer will have to have an **ssh** access to the remote machine first while with FusionReactor it's a matter of opening your browser.
+The first big difference comes with the way both tools are used. FusionReactor offers a web interface to monitor your JVM processes. The interface can be launched locally or through the Cloud in order to monitor remote processes in production environment. On the other hand `jcmd` can only be used within a terminal. Most people who get used to a great user experience offered by web or desktop apps won't feel comfortable opening the terminal to monitor the performance of the underlying application. Moreover, `jcmd` can only get snapshots of the JVM processes that runs on the same host which means that `jcmd` does not support remote processes. In order to use `jcmd` in production the developer will have to have an **ssh** access to the remote machine first while with FusionReactor it's a matter of opening your browser.
 
 ### Threads
-As was shown above, `jcmd` can print the stacktraces of all threads running in the JVM with the following command `jcmd <process id/main class> Thread.print`. For regular Servlet based backends with few hunderds threads serving user requests the output will be unreadable. Developer must rely on other utilities such as `grep` or `awk` in order to get the stacktraces of the Servlet Thread they are interested in.
+As was shown above, `jcmd` (same as as `jstack`) can print the stacktraces of all threads running in the JVM with the following command `jcmd <process id/main class> Thread.print`. For regular Servlet based backends with few hunderds threads serving user requests the output will be unreadable.Developer must rely on other utilities such as `grep` or `awk` in order to get the stacktraces of the Servlet Thread they are interested in. In production environment most of our clients had ended up with a lot of bash scripts which present the output from `jcmd` in a human readable form. Moreover, the output from `jcmd` gives you a stacktraces as a plain text. It has several problems such as
+1. It's not clear which method in the call stack took the most amount of CPU cycles.
+2. In order to trace the issue , the developer will have to :TODO: here
+Another big problem with 
+You won't have any of these issues using FusionReactor. 
 
-On the other hand, **FusionReactor** offers a separate page that covers all Thread related information.
+ **FusionReactor** offers a separate page that covers all Thread related information.
 ![Threads](https://www.fusion-reactor.com/wp-content/uploads/2022/06/Threads.png)
-The interface offers a list of available threads with corresponding states (E.g RUNNABLE or WAITING). Moreover, **FusionReactor** doesn't show the stacktraces as a plain text, all stacktraces are shown in prettified format that helps developers to better understand what the thread is actually doing
+The interface offers a list of available threads with corresponding states (E.g RUNNABLE or WAITING). The build-in loookup functionality will allow you to filter threads by name or by state. Moreover, **FusionReactor** doesn't show the stacktraces as a plain text, all stacktraces are shown in prettified format that helps developers to better understand what the thread is actually doing
 ![Stracktrace](https://www.fusion-reactor.com/wp-content/uploads/2022/06/Stacktrace.png)
 Apart from that, the dynamic nature of **FusionReactor** allows you to stop or pause the running thread.
 
@@ -87,6 +91,7 @@ As `jcmd` is a command line utility it can be used as part of a shell script. De
 `jcmd` is a great tool for simple Java profiling that only covers current state of the JVM. If you need a whole monitoring system which supports all the featured offered by `jcmd` and more(Web performance, Live Debugging, System Monitoring) then consider using FusionReactor.
 
 ## TODO
-1. jcmd only locally
-2. ssh access
+1. [X] jcmd only locally
+2. [X] ssh access
 3. live recording
+4. user experience( what are the commands )
